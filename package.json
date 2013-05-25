@@ -1,0 +1,23 @@
+{
+  "name": "plugman-registry",
+  "version": "0.0.1",
+  "description": "Registry manager for cordova-plugman",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:imhotep/plugman-registry.git"
+  },
+  "keywords": [
+    "cordova",
+    "plugman",
+    "registry"
+  ],
+  "author": "Anis Kadri",
+  "license": "Apache",
+  "bugs": {
+    "url": "https://github.com/imhotep/plugman-registry/issues"
+  }
+}
