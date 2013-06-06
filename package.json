@@ -11,8 +11,8 @@
     "url": "git@github.com:imhotep/plugman-registry.git"
   },
   "dependencies": {
-    "mocha": "1.10.0",
-    "npm-registry-client": "0.2.24"
+    "npm": "1.2.25",
+    "rc": "0.3.0"
   },
   "keywords": [
     "cordova",
