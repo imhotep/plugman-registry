@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "npm": "1.2.25",
-    "rc": "0.3.0"
+    "rc": "0.3.0",
+    "mocha": "1.10.0",
+    "xmldom": "0.1.16"
   },
   "keywords": [
     "cordova",

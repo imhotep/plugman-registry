@@ -33,7 +33,3 @@ function handleError(er) {
   console.log(er);
 }
 
-module.exports.adduser(null, function(er) {
-  if(er) return handleError(er); 
-  console.log('success');
-});
