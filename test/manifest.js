@@ -35,7 +35,7 @@ describe('manifest', function() {
   
   it('should read plugin.xml and generate package.json', function() {
     var package_json = manifest.generatePackageJsonFromPluginXml(tmp_plugin_path);
-    assert.equal('DummyPlugin', package_json.name);
+    assert.equal('dummyplugin', package_json.name);
     assert.equal('0.6.0', package_json.version);
     assert.equal(null, package_json.description);
     assert.equal('dummy', package_json.keywords[0]);

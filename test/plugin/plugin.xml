@@ -23,7 +23,7 @@
     id="com.phonegap.plugins.dummyplugin"
     version="0.6.0">
     <!-- new requirement: NO SPACES -->
-    <name>DummyPlugin</name>
+    <name>dummyplugin</name>
     <!-- These are going to be required by plugman-registry -->
     <description></description>
     <author>Jackson Badman</author> 
