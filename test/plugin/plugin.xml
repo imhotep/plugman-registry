@@ -22,8 +22,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.dummyplugin"
     version="0.6.0">
-
-    <name>Dummy Plugin</name>
+    <!-- new requirement: NO SPACES -->
+    <name>DummyPlugin</name>
     <!-- These are going to be required by plugman-registry -->
     <description></description>
     <author>Jackson Badman</author> 
