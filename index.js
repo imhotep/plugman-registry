@@ -1,4 +1,6 @@
 var npm = require('npm'),
+    path = require('path'),
+    manifest = require(path.resolve(__dirname, 'lib', 'manifest')),
     os = require('os'),
     rc = require('rc')('plugman', {
                  registry: 'http://localhost:5984/registry/_design/scratch/_rewrite',
@@ -22,14 +24,24 @@ module.exports = {
     });
   },
   publish: function(args, cb) {
-    // TODO read plugin.xml and create package.json
-    // Publish: need to figure out how users are retrieved
+    manifest.generatePackageJsonFromPluginXml(args);
+    npm.load(rc, function(er) {
+      if (er) return handlError(er);
+      npm.commands.publish(args, cb);
+    });
+  },
+  search: function(args, cb) {
+    npm.load(rc, function(er) {
+      if (er) return handlError(er);
+      npm.commands.search(args, cb);
+    });
   },
   unpublish: function(args, cb) {
+    // TODO
   }
 }
 
-function handleError(er) {
-  console.log(er);
-}
-
+// TODO: remove this shit
+//module.exports.adduser(null, function() { console.log('user added!'); });
+//module.exports.publish(path.resolve(__dirname,'test', 'plugin'), function(er) { console.log('package published!'); });
+module.exports.search(null, function(er, data) { console.log(data); });
