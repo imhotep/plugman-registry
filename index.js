@@ -8,10 +8,6 @@ var npm = require('npm'),
                  userconfig: process.env.HOME + '/.plugmanrc'
                });
 
-function handleError(er) {
-  console.log(er);
-}
-
 npm.on('log', function(message) {
   console.log(message);
 });
@@ -24,7 +20,8 @@ module.exports = {
     });
   },
   publish: function(args, cb) {
-    manifest.generatePackageJsonFromPluginXml(args);
+    console.log(args);
+    manifest.generatePackageJsonFromPluginXml(args[0]);
     npm.load(rc, function(er) {
       if (er) return handlError(er);
       npm.commands.publish(args, cb);
@@ -41,7 +38,12 @@ module.exports = {
   }
 }
 
+function myCallback(er, data) {
+  if(er) console.log(er);
+//  console.log('success', data);
+}
+
 // TODO: remove this shit
 //module.exports.adduser(null, function() { console.log('user added!'); });
-//module.exports.publish(path.resolve(__dirname,'test', 'plugin'), function(er) { console.log('package published!'); });
-module.exports.search(null, function(er, data) { console.log(data); });
+// module.exports.publish([path.resolve(__dirname,'test', 'plugin')], myCallback);
+//module.exports.search(['dummy'], myCallback);
