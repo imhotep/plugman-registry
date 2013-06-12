@@ -1,0 +1,2 @@
+rm -rvf $HOME/.plugman
+curl -X DELETE http://localhost:5984/registry && curl -X PUT http://localhost:5984/registry && couchapp push ~/Projects/cordova/npmjs.org/registry/app.js http://localhost:5984/registry

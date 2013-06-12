@@ -1,5 +1,6 @@
 var npm = require('npm'),
     path = require('path'),
+    http = require('http'),
     fs = require('fs'),
     manifest = require(path.resolve(__dirname, 'lib', 'manifest')),
     os = require('os'),
@@ -9,10 +10,6 @@ var npm = require('npm'),
     local_registry = 'http://localhost:5984/registry/_design/scratch/_rewrite';
 
 var config = null;
-// TODO log this somewhere else
-npm.on('log', function(message) {
-  console.log(message);
-});
 
 function checkConfig(cb) {
   if(config != null) {
@@ -27,6 +24,25 @@ function handleError(err, cb) {
     return cb(err);
   }
   throw err;
+}
+
+/**
+ * @method use
+ * @param {String} name Package name 
+ */
+function getPackageInfo(name) {
+  var request = http.get(config.registry + '/' + name, function(res) {
+    console.log(res);
+     // if(res.statusCode != 200) {
+     //     var err = new Error('Error');
+     //     if (cb) cb(err);
+     //     else throw err;
+     // } else {
+     //     res.on('end', function() {
+     //       cb(null, target);
+     //     });
+     // }
+  });
 }
 
 module.exports = {
@@ -48,6 +64,7 @@ module.exports = {
     config = rc('plugman', {
                  registry:  registry || local_registry,
                  cache: plugmanCacheDir,
+                 logstream: fs.createWriteStream(path.resolve(plugmanConfigDir, 'plugman.log')),
                  userconfig: path.resolve(plugmanConfigDir, 'plugmanrc')
                });
     cb();
@@ -59,7 +76,7 @@ module.exports = {
    */
   adduser: function(args, cb) {
     checkConfig(function(err) {
-      if(err) return handleError(err, cb);
+      if(err) return handleError(err, cb)
       npm.load(config, function(er) {
         if (er) return handlError(er);
         npm.commands.adduser(args, cb);
@@ -111,10 +128,32 @@ module.exports = {
         npm.commands.unpublish(args, cb);
       });
     });
+  },
+  /**
+   * @method fetch
+   * @param {String} name Plugin name
+   * @param {Function} cb Command callback
+   */
+  fetch: function(args, cb) {
+    checkConfig(function(err) {
+      if(err) return handleError(err, cb)
+      getPackageName(name, function(source) {
+        var target = os.tmpdir() + name;
+        var file = fs.createWriteStream(target);
+        var request = http.get(source, function(res) {
+            if(res.statusCode != 200) {
+                var err = new Error('failed to fetch the plugin archive');
+                if (cb) cb(err);
+                else throw err;
+            } else {
+                res.pipe(file);
+                res.on('end', function() {
+                  // TODO untar
+                  cb(null, target);
+                });
+            }
+        });
+      });
+    }
   }
 }
-
-// TODO: remove this shit
-// module.exports.adduser(null, function() { console.log('user added!'); });
-// module.exports.publish([path.resolve(__dirname,'test', 'plugin')], myCallback);
-// module.exports.search(['dummy'], myCallback);
