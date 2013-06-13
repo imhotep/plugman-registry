@@ -1,6 +1,7 @@
 var npm = require('npm'),
     path = require('path'),
     http = require('http'),
+    targz = require('tar.gz'),
     fs = require('fs'),
     manifest = require(path.resolve(__dirname, 'lib', 'manifest')),
     os = require('os'),
@@ -15,7 +16,7 @@ function checkConfig(cb) {
   if(config != null) {
     cb();
   } else {
-    cb(new Error('Call plugman-registry.use(registry, cb) before using this command\n'));
+    cb(new Error('Call registry.use(registry, cb) before using this command\n'));
   }
 }
 
@@ -29,20 +30,62 @@ function handleError(err, cb) {
 /**
  * @method use
  * @param {String} name Package name 
+ * @param {Function} cb callback 
  */
-function getPackageInfo(name) {
-  var request = http.get(config.registry + '/' + name, function(res) {
-    console.log(res);
-     // if(res.statusCode != 200) {
-     //     var err = new Error('Error');
-     //     if (cb) cb(err);
-     //     else throw err;
-     // } else {
-     //     res.on('end', function() {
-     //       cb(null, target);
-     //     });
-     // }
+function getPackageInfo(args, cb) {
+  var thing = args.length ? args.shift().split("@") : [],
+      name = thing.shift(),
+      version = thing.join("@"),
+  
+  version = version ? version : 'latest';
+  
+  http.get(local_registry + '/' + name + '/' + version, function(res) {
+     if(res.statusCode != 200) {
+         var err = new Error('Error');
+         if (cb) cb(err);
+         else throw err;
+     } else {
+       var info = '';
+       res.on('data', function(chunk) {
+        info += chunk;
+       });
+       res.on('end', function() {
+         cb(null, JSON.parse(info));
+       });
+     }
+  }).on('error', function(err) {
+    cb(err); 
   });
+}
+
+/**
+ * @method use
+ * @param {String} name Package name 
+ * @param {Function} cb callback 
+ */
+function fetchPackage(info, cb) {
+  console.log(info);
+  var cached = path.resolve(config.cache, info.name, info.version, 'package');
+  if(fs.existsSync(cached)) {
+    cb(null, cached);
+  } else {
+    var target = os.tmpdir() + info.name;
+    var file = fs.createWriteStream(target + '.tgz');
+    var request = http.get(info.dist.tarball, function(res) {
+        if(res.statusCode != 200) {
+            var err = new Error('failed to fetch the plugin archive');
+            if (cb) cb(err);
+            else throw err;
+        } else {
+          res.pipe(file);
+          res.on('end', function() {
+            var decompress = new targz().extract(target + '.tgz', target, function(err) {
+              cb(err, target);
+            });
+          });
+        }
+    });
+  }
 }
 
 module.exports = {
@@ -137,23 +180,10 @@ module.exports = {
   fetch: function(args, cb) {
     checkConfig(function(err) {
       if(err) return handleError(err, cb)
-      getPackageName(name, function(source) {
-        var target = os.tmpdir() + name;
-        var file = fs.createWriteStream(target);
-        var request = http.get(source, function(res) {
-            if(res.statusCode != 200) {
-                var err = new Error('failed to fetch the plugin archive');
-                if (cb) cb(err);
-                else throw err;
-            } else {
-                res.pipe(file);
-                res.on('end', function() {
-                  // TODO untar
-                  cb(null, target);
-                });
-            }
-        });
+      getPackageInfo(args, function(err, info) {
+        if(err) return handleError(err, cb)
+        fetchPackage(info, cb);
       });
-    }
+    });
   }
 }
