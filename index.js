@@ -155,7 +155,7 @@ module.exports = {
       if(err) return handleError(err, cb);
       npm.load(config, function(er) {
         if (er) return handlError(er);
-        npm.commands.search(args, cb);
+        npm.commands.search(args, true, cb);
       });
     });
   },
