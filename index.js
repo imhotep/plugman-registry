@@ -80,7 +80,7 @@ function fetchPackage(info, cb) {
           res.pipe(file);
           res.on('end', function() {
             var decompress = new targz().extract(target + '.tgz', target, function(err) {
-              cb(err, target);
+              cb(err, path.resolve(target, 'package'));
             });
           });
         }
@@ -107,6 +107,7 @@ module.exports = {
     config = rc('plugman', {
                  registry:  registry || local_registry,
                  cache: plugmanCacheDir,
+                 force: true,
                  logstream: fs.createWriteStream(path.resolve(plugmanConfigDir, 'plugman.log')),
                  userconfig: path.resolve(plugmanConfigDir, 'plugmanrc')
                });
