@@ -64,7 +64,6 @@ function getPackageInfo(args, cb) {
  * @param {Function} cb callback 
  */
 function fetchPackage(info, cb) {
-  console.log(info);
   var cached = path.resolve(config.cache, info.name, info.version, 'package');
   if(fs.existsSync(cached)) {
     cb(null, cached);
@@ -154,7 +153,7 @@ module.exports = {
     checkConfig(function(err) {
       if(err) return handleError(err, cb);
       npm.load(config, function(er) {
-        if (er) return handlError(er);
+        if (er) return handlError(er, cb);
         npm.commands.search(args, true, cb);
       });
     });
@@ -169,7 +168,10 @@ module.exports = {
       if(err) return handleError(err, cb);
       npm.load(config, function(er) {
         if (er) return handlError(er);
-        npm.commands.unpublish(args, cb);
+        npm.commands.unpublish(args, function(err, d) {
+          if(err) return handleError(err, cb);
+          npm.commands.cache(["clean"], cb);
+        });
       });
     });
   },
