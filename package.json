@@ -1,6 +1,6 @@
 {
   "name": "plugman-registry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Registry manager for cordova-plugman",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git@github.com:imhotep/plugman-registry.git"
   },
   "dependencies": {
-    "npm": "1.2.25",
+    "npm": "1.3.4",
     "rc": "0.3.0",
     "mocha": "1.10.0",
     "xmldom": "0.1.16",
