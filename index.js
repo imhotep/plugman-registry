@@ -39,7 +39,7 @@ function getPackageInfo(args, cb) {
   
   version = version ? version : 'latest';
   
-  http.get(local_registry + '/' + name + '/' + version, function(res) {
+  http.get(config.registry + '/' + name + '/' + version, function(res) {
      if(res.statusCode != 200) {
          var err = new Error('Error');
          if (cb) cb(err);
@@ -69,18 +69,19 @@ function fetchPackage(info, cb) {
     cb(null, cached);
   } else {
     var target = os.tmpdir() + info.name;
-    var file = fs.createWriteStream(target + '.tgz');
+    var filename = target + '.tgz';
+    var filestream = fs.createWriteStream(filename);
     var request = http.get(info.dist.tarball, function(res) {
         if(res.statusCode != 200) {
             var err = new Error('failed to fetch the plugin archive');
             if (cb) cb(err);
             else throw err;
         } else {
-          res.pipe(file);
-          res.on('end', function() {
-            var decompress = new targz().extract(target + '.tgz', target, function(err) {
-              cb(err, path.resolve(target, 'package'));
-            });
+          res.pipe(filestream);
+          filestream.on('finish', function() {
+              var decompress = new targz().extract(filename, target, function(err) {
+                cb(err, path.resolve(target, 'package'));
+              });
           });
         }
     });

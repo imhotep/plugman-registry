@@ -1,6 +1,6 @@
 {
   "name": "plugman-registry",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Registry manager for cordova-plugman",
   "main": "index.js",
   "scripts": {
